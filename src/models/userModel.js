@@ -1,9 +1,18 @@
 /** @format */
 
-const { default: mongoose } = require("mongoose");
+const { default: mongoose, isValidObjectId, Schema } = require("mongoose");
 
 const UserSchema = new mongoose.Schema({
-  fullname: {
+  name: {
+    type: String,
+  },
+  givenName: {
+    type: String,
+  },
+  familyName: {
+    type: String,
+  },
+  bio: {
     type: String,
   },
   email: {
@@ -14,7 +23,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
-  photoUrl: {
+  photo: {
     type: String,
   },
   createdAt: {
@@ -24,6 +33,18 @@ const UserSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now(),
+  },
+  fcmTokens: {
+    type: [String],
+  },
+  following: {
+    type: [String],
+  },
+  followers: {
+    type: [String],
+  },
+  interests: {
+    type: [String],
   },
 });
 
