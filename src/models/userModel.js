@@ -23,7 +23,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
-  photo: {
+  photoUrl: {
     type: String,
   },
   createdAt: {
