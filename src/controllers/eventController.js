@@ -179,7 +179,7 @@ const getEventsByCategoyId = asyncHandle(async (req, res) => {
   });
 });
 
-module.exports = { 
+module.exports = {
   addNewEvent,
   getEvents,
   updateFollowers,
