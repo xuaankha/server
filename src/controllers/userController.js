@@ -101,7 +101,6 @@ const updateFcmToken = asyncHandle(async (req, res) => {
   await UserModel.findByIdAndUpdate(uid, {
     fcmTokens,
   });
-
   res.status(200).json({
     message: "Fcmtoken updated",
     data: [],
