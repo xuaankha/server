@@ -8,7 +8,16 @@ const CategorySchema = new mongoose.Schema({
     type: String,
   },
   key: {
-    type: Number,
+    type: String,
+  },
+  iconColor: {
+    type: String,
+  },
+  iconWhite: {
+    type: String,
+  },
+  color: {
+    type: String,
   },
   createdAt: {
     type: Date,

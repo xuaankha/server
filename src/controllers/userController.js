@@ -67,9 +67,6 @@ const getEventsFollowed = asyncHandle(async (req, res) => {
 const getProfile = asyncHandle(async (req, res) => {
   const { uid } = req.query;
 
-  // const accesstoken = await getAccessToken();
-  // console.log(accesstoken);
-
   if (uid) {
     const profile = await UserModel.findOne({ _id: uid });
 
@@ -101,6 +98,7 @@ const updateFcmToken = asyncHandle(async (req, res) => {
   await UserModel.findByIdAndUpdate(uid, {
     fcmTokens,
   });
+
   res.status(200).json({
     message: "Fcmtoken updated",
     data: [],
@@ -127,13 +125,7 @@ const getAccessToken = () => {
   });
 };
 
-const handleSendNotification = async ({
-  token,
-  title,
-  subtitle,
-  body,
-  data,
-}) => {
+const handleSendNotification = async ({ fcmTokens, title, body, data }) => {
   var request = require("request");
   var options = {
     method: "POST",
@@ -144,21 +136,19 @@ const handleSendNotification = async ({
     },
     body: JSON.stringify({
       message: {
-        token,
+        token: fcmTokens,
         notification: {
           title,
           body,
-          subtitle,
         },
         data,
       },
     }),
   };
   request(options, function (error, response) {
+    console.log(response);
     if (error) throw new Error(error);
     console.log(error);
-
-    console.log(response);
   });
 };
 
@@ -276,11 +266,11 @@ const pushInviteNotifications = asyncHandle(async (req, res) => {
   ids.forEach(async (id) => {
     const user = await UserModel.findById(id);
 
-    const fcmTokens = user.fcmTokens;
+    if (user) {
+      const fcmTokens = user.fcmTokens;
 
-    if (fcmTokens > 0) {
-      fcmTokens.forEach(
-        async (token) =>
+      if (fcmTokens.length > 0) {
+        fcmTokens.forEach(async (token) => {
           await handleSendNotification({
             fcmTokens: token,
             title: "fasfasf",
@@ -289,19 +279,23 @@ const pushInviteNotifications = asyncHandle(async (req, res) => {
             data: {
               eventId,
             },
-          })
-      );
+          });
+        });
+      } else {
+        // Send mail
+        const data = {
+          from: `"Support EventHub Appplication" <${process.env.USERNAME_EMAIL}>`,
+          to: user.email,
+          subject: "Verification email code",
+          text: "Your code to verification email",
+          html: `<h1>${eventId}</h1>`,
+        };
+        await handleSendMail(data);
+      }
     } else {
-      // Send mail
-      const data = {
-        from: `"Support EventHub Appplication" <${process.env.USERNAME_EMAIL}>`,
-        to: email,
-        subject: "Verification email code",
-        text: "Your code to verification email",
-        html: `<h1>${eventId}</h1>`,
-      };
-
-      await handleSendMail(data);
+      console.log("User not found");
+      res.sendStatus(401);
+      throw new Error("User not found");
     }
   });
 
